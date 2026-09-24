@@ -1,0 +1,160 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function profile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function activeUser() {
+      return signedIn() && profile().data.active == true;
+    }
+
+    function role() {
+      return profile().data.role;
+    }
+
+    function level() {
+      return profile().data.level;
+    }
+
+    function isOwner() { return activeUser() && role() == 'owner'; }
+    function isWebsiteManager() { return activeUser() && role() == 'website_manager'; }
+    function isCollegeManager() { return activeUser() && role() == 'scientific_college_manager'; }
+    function isCollegeDeputy() { return activeUser() && role() == 'scientific_college_deputy'; }
+    function isLevelManager() { return activeUser() && role() == 'scientific_level_manager'; }
+    function isLevelDeputy() { return activeUser() && role() == 'scientific_level_deputy'; }
+    function isForumManager() { return activeUser() && role() == 'university_forum_manager'; }
+    function isForumDeputy() { return activeUser() && role() == 'university_forum_deputy'; }
+    function isMediaManager() { return activeUser() && role() == 'media_manager'; }
+    function isMediaDeputy() { return activeUser() && role() == 'media_deputy'; }
+    function isStaff() {
+      return isOwner() || isWebsiteManager() || isCollegeManager() || isCollegeDeputy()
+        || isLevelManager() || isLevelDeputy() || isForumManager() || isForumDeputy()
+        || isMediaManager() || isMediaDeputy();
+    }
+
+    function sameLevelResource() {
+      return resource.data.level == level() || resource.data.level == 'all';
+    }
+
+    // Site settings: public read, privileged write through callable functions only.
+    match /settings/{docId} {
+      allow read: if activeUser() || docId == 'site';
+      allow write: if false;
+    }
+
+    // User profile: self read/write only for safe fields; role/status are server-managed.
+    match /users/{uid} {
+      allow read: if activeUser() && (request.auth.uid == uid || isStaff());
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.role == 'student'
+        && request.resource.data.active == true
+        && request.resource.data.email == request.auth.token.email;
+      allow update: if activeUser() && request.auth.uid == uid
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.active == resource.data.active
+        && request.resource.data.level == resource.data.level;
+      allow delete: if false;
+    }
+
+    // Direct client administration
+    match /courses/{id} {
+      allow read: if activeUser();
+
+      allow create: if isOwner()
+        || isWebsiteManager()
+        || isCollegeManager();
+
+      allow update: if isOwner()
+        || isWebsiteManager()
+        || isCollegeManager();
+
+      allow delete: if isOwner()
+        || isWebsiteManager();
+    }
+
+    match /exams/{id} {
+      allow read: if activeUser() && resource.data.active == true;
+
+      allow create: if isOwner()
+        || isWebsiteManager()
+        || isCollegeManager()
+        || isCollegeDeputy()
+        || isLevelManager();
+
+      allow update: if isOwner()
+        || isWebsiteManager()
+        || isCollegeManager()
+        || isCollegeDeputy()
+        || isLevelManager();
+
+      allow delete: if isOwner()
+        || isWebsiteManager();
+    }
+
+    match /announcements/{id} {
+      allow read: if activeUser() && resource.data.active == true;
+      allow create: if activeUser() &&
+        (isOwner() || isWebsiteManager() || isCollegeManager() ||
+         isForumManager() || isForumDeputy() || isMediaManager() || isMediaDeputy()) &&
+        request.resource.data.authorId == request.auth.uid;
+      allow update: if activeUser() &&
+        (isOwner() || isWebsiteManager() || isCollegeManager() ||
+         isForumManager() || isForumDeputy() || isMediaManager() || isMediaDeputy());
+    }
+
+    match /reports/{id} {
+      allow read: if activeUser() && resource.data.active == true;
+      allow create: if activeUser() &&
+        (isOwner() || isWebsiteManager() || isCollegeManager() ||
+         isForumManager() || isForumDeputy() || isMediaManager() || isMediaDeputy()) &&
+        request.resource.data.authorId == request.auth.uid;
+      allow update: if activeUser() &&
+        (isOwner() || isWebsiteManager() || isCollegeManager() ||
+         isForumManager() || isForumDeputy() || isMediaManager() || isMediaDeputy());
+    }
+
+    match /activities/{id} {
+      allow read: if activeUser() && resource.data.active == true;
+      allow create: if activeUser() &&
+        (isOwner() || isWebsiteManager() || isCollegeManager() ||
+         isForumManager() || isForumDeputy() || isMediaManager() || isMediaDeputy()) &&
+        request.resource.data.authorId == request.auth.uid;
+      allow update: if activeUser() &&
+        (isOwner() || isWebsiteManager() || isCollegeManager() ||
+         isForumManager() || isForumDeputy() || isMediaManager() || isMediaDeputy());
+    }
+
+    match /media/{id} {
+      allow read: if activeUser() && resource.data.active == true;
+      allow create: if activeUser() &&
+        (isOwner() || isWebsiteManager() || isCollegeManager() ||
+         isForumManager() || isForumDeputy() || isMediaManager() || isMediaDeputy()) &&
+        request.resource.data.authorId == request.auth.uid;
+      allow update: if activeUser() &&
+        (isOwner() || isWebsiteManager() || isCollegeManager() ||
+         isForumManager() || isForumDeputy() || isMediaManager() || isMediaDeputy());
+    }
+
+    // Student results are private; staff can read aggregate results through server functions.
+    match /results/{id} {
+      allow read: if activeUser() && (resource.data.userId == request.auth.uid || isStaff());
+      allow write: if false;
+    }
+
+    match /auditLogs/{id} {
+      allow read: if isOwner() || isWebsiteManager();
+      allow write: if false;
+    }
+
+    // Answer keys are never readable from the client.
+    match /examKeys/{id} {
+      allow read, write: if false;
+    }
+  }
+}

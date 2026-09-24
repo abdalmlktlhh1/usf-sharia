@@ -1,0 +1,15 @@
+.firebase/
+.firebaserc
+node_modules/
+functions/node_modules/
+public/firebase-config.js
+serviceAccountKey.json
+*.log
+
+# Secrets
+firebase-service.json
+**/firebase-service.json
+supabase-service.json
+**/supabase-service.json
+.env
+.env.*

@@ -1,0 +1,14 @@
+الترتيب المختصر:
+
+1) أنشئ مشروع Firebase.
+2) فعّل Email/Password + Firestore + Storage + Functions + Hosting.
+3) أضف Web App وانسخ إعداداته إلى public/firebase-config.js.
+4) أنشئ حساب Gmail من الموقع.
+5) في Firestore Console افتح users ثم ملف حسابك، واجعل role=owner و level=all و active=true.
+6) في Termux:
+   firebase login
+   firebase use PROJECT_ID
+   cd functions && npm install && cd ..
+7) النشر:
+   firebase deploy --only firestore,storage,functions,hosting
+8) افتح رابط Firebase Hosting.

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="منصة خدمة طلاب كلية الشريعة والقانون">
+  <title>منصة خدمة الطلاب | كلية الشريعة والقانون</title>
+  <link rel="icon" href="./assets/logo-placeholder.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <div id="busy" class="busy hidden"><div class="spinner"></div><span>جاري التنفيذ…</span></div>
+
+  <section id="authView" class="auth-view">
+    <div class="auth-glow glow-a"></div>
+    <div class="auth-glow glow-b"></div>
+    <div class="auth-wrap">
+      <div class="auth-visual">
+        <div class="visual-brand">
+          <img id="authLogo" src="./assets/logo-placeholder.svg" alt="شعار المنصة">
+          <div><b id="authCollegeName">كلية الشريعة والقانون</b><span id="authSiteName">منصة خدمة الطلاب</span></div>
+        </div>
+        <div class="visual-copy">
+          <span class="eyebrow">منصة أكاديمية متكاملة</span>
+          <h1 id="authHeadline">خدماتك الدراسية في مساحة واحدة.</h1>
+          <p id="authTagline">المقررات، الاختبارات، النتائج، الإعلانات، الأنشطة وخدمات اللجان العلمية، بواجهة واحدة مرنة قابلة للتخصيص.</p>
+        </div>
+        <div class="visual-points">
+          <div><span class="bullet">✓</span>حساب شخصي لكل طالب</div>
+          <div><span class="bullet">✓</span>صلاحيات إدارية متعددة المستويات</div>
+          <div><span class="bullet">✓</span>استرجاع كلمة المرور عبر البريد</div>
+        </div>
+      </div>
+
+      <div class="auth-panel">
+        <div class="mobile-brand">
+          <img id="authLogoMobile" src="./assets/logo-placeholder.svg" alt="">
+          <div><b id="authSiteNameMobile">منصة خدمة الطلاب</b><span id="authCollegeNameMobile">كلية الشريعة والقانون</span></div>
+        </div>
+
+        <div id="loginCard" class="auth-card">
+          <span class="eyebrow">الدخول</span>
+          <h2>مرحبًا بك</h2>
+          <p class="muted">سجّل الدخول للوصول إلى حسابك وخدماتك.</p>
+          <form id="loginForm" class="stack-form">
+            <label>البريد الإلكتروني<input id="loginEmail" type="email" autocomplete="username" required placeholder="name@gmail.com"></label>
+            <label>كلمة المرور
+              <span class="input-action-wrap"><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="••••••••"><button type="button" class="icon-text-btn" data-password-toggle="loginPassword">إظهار</button></span>
+            </label>
+            <div class="form-row between"><label class="check"><input id="rememberMe" type="checkbox" checked> تذكرني</label><button type="button" class="link-btn" id="forgotBtn">نسيت كلمة المرور؟</button></div>
+            <button class="btn primary wide" type="submit">دخول المنصة <span>←</span></button>
+          </form>
+          <div class="switch-line">ليس لديك حساب؟ <button type="button" class="link-btn" id="signupBtn">إنشاء حساب جديد</button></div>
+        </div>
+
+        <div id="signupCard" class="auth-card hidden">
+          <span class="eyebrow">حساب جديد</span>
+          <h2>أنشئ حسابك</h2>
+          <p class="muted">الخانات المعلّمة مطلوبة. يجب أن يكون البريد Gmail.</p>
+          <form id="signupForm" class="stack-form">
+            <label>عنوان البريد الإلكتروني <em>*</em><input id="signupEmail" type="email" required placeholder="name@gmail.com" autocomplete="email"></label>
+            <label>الاسم الكامل <em>*</em><input id="signupName" type="text" required maxlength="120" placeholder="اكتب اسمك الكامل" autocomplete="name"></label>
+            <label>رقم الهاتف <small>اختياري</small><input id="signupPhone" type="tel" maxlength="30" placeholder="مثال: 77xxxxxxx" autocomplete="tel"></label>
+            <label>المستوى الدراسي <em>*</em><select id="signupLevel" required><option value="" selected disabled>اختر المستوى</option><option value="1">المستوى الأول</option><option value="2">المستوى الثاني</option><option value="3">المستوى الثالث</option><option value="4">المستوى الرابع</option></select></label>
+            <label>كلمة المرور <em>*</em><span class="input-action-wrap"><input id="signupPassword" type="password" minlength="8" required placeholder="8 أحرف على الأقل"><button type="button" class="icon-text-btn" data-password-toggle="signupPassword">إظهار</button></span></label>
+            <label>تأكيد كلمة المرور <em>*</em><span class="input-action-wrap"><input id="signupConfirm" type="password" minlength="8" required placeholder="أعد كتابة كلمة المرور"><button type="button" class="icon-text-btn" data-password-toggle="signupConfirm">إظهار</button></span></label>
+            <label class="check"><input id="signupTerms" type="checkbox" required> أوافق على شروط استخدام المنصة وسياسة الاستخدام الأكاديمي.</label>
+            <button class="btn primary wide" type="submit">إنشاء الحساب</button>
+          </form>
+          <div class="switch-line">لديك حساب بالفعل؟ <button type="button" class="link-btn" id="backLoginBtn">العودة لتسجيل الدخول</button></div>
+        </div>
+
+        <div id="forgotCard" class="auth-card hidden">
+          <span class="eyebrow">استرجاع الحساب</span>
+          <h2>نسيت كلمة المرور؟</h2>
+          <p class="muted">سنرسل رابطًا إلى بريدك لإعادة تعيين كلمة المرور.</p>
+          <form id="forgotForm" class="stack-form">
+            <label>البريد الإلكتروني<input id="forgotEmail" type="email" required placeholder="name@gmail.com"></label>
+            <button class="btn primary wide" type="submit">إرسال رابط الاسترجاع</button>
+          </form>
+          <div class="switch-line"><button type="button" class="link-btn" id="forgotBackBtn">العودة</button></div>
+        </div>
+
+        <div class="auth-footnote"><span class="secure-dot"></span><span>مصادقة Firebase + صلاحيات Firestore مؤمّنة بقواعد خادم.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="appView" class="app-view hidden">
+    <header class="topbar">
+      <div class="brand-block">
+        <img id="appLogo" class="brand-logo" src="./assets/logo-placeholder.svg" alt="">
+        <div><b id="appSiteName">منصة خدمة الطلاب</b><span id="appCollegeName">كلية الشريعة والقانون</span></div>
+      </div>
+      <div class="top-actions">
+        <button id="themeQuickBtn" class="icon-btn" title="الوضع الليلي">◐</button>
+        <button id="refreshBtn" class="icon-btn" title="تحديث">↻</button>
+        <div class="user-chip"><span id="topAvatar" class="avatar">ط</span><div><b id="topUserName">—</b><span id="topRole">—</span></div></div>
+        <button id="logoutBtn" class="btn soft">خروج</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="sidebar">
+        <div class="side-title">القائمة</div>
+        <button class="side-nav active" data-page="home"><span>⌂</span>الرئيسية</button>
+        <button class="side-nav" data-page="courses"><span>▦</span>المقررات</button>
+        <button class="side-nav" data-page="exams"><span>✓</span>الاختبارات</button>
+        <button class="side-nav" data-page="results"><span>◔</span>نتائجي</button>
+        <button class="side-nav" data-page="announcements"><span>▤</span>الإعلانات</button>
+        <button class="side-nav" data-page="activities"><span>✦</span>الأنشطة</button>
+        <button class="side-nav" data-page="reports"><span>▧</span>التقارير</button>
+        <button class="side-nav" data-page="media"><span>◫</span>الوسائط</button>
+        <div id="adminNavGroup" class="hidden"><div class="side-sep"></div><div class="side-title">الإدارة</div><button class="side-nav" data-page="admin"><span>⚙</span>لوحة التحكم</button></div>
+        <div class="sidebar-end"><span class="status-dot"></span><span>متصل</span></div>
+      </aside>
+
+      <main class="main-content">
+        <div id="page-home" class="page"></div>
+        <div id="page-courses" class="page hidden"></div>
+        <div id="page-exams" class="page hidden"></div>
+        <div id="page-results" class="page hidden"></div>
+        <div id="page-announcements" class="page hidden"></div>
+        <div id="page-activities" class="page hidden"></div>
+        <div id="page-reports" class="page hidden"></div>
+        <div id="page-media" class="page hidden"></div>
+        <div id="page-admin" class="page hidden"></div>
+        <div id="page-exam" class="page hidden"></div>
+      </main>
+    </div>
+
+    <nav class="mobile-nav">
+      <button class="mobile-nav-btn active" data-page="home">⌂<small>الرئيسية</small></button>
+      <button class="mobile-nav-btn" data-page="courses">▦<small>المقررات</small></button>
+      <button class="mobile-nav-btn" data-page="exams">✓<small>اختبارات</small></button>
+      <button class="mobile-nav-btn" data-page="results">◔<small>نتائجي</small></button>
+      <button id="mobileAdminNav" class="mobile-nav-btn hidden" data-page="admin">⚙<small>الإدارة</small></button>
+    </nav>
+  </section>
+
+  <div id="modalRoot"></div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
