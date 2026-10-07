@@ -2,7 +2,6 @@
 .firebaserc
 node_modules/
 functions/node_modules/
-public/firebase-config.js
 serviceAccountKey.json
 *.log
 

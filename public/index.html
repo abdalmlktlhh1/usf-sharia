@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#0f766e">
   <meta name="description" content="منصة خدمة طلاب كلية الشريعة والقانون">
   <title>منصة خدمة الطلاب | كلية الشريعة والقانون</title>
+  <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/logo-placeholder.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,23 +56,26 @@
             <div class="form-row between"><label class="check"><input id="rememberMe" type="checkbox" checked> تذكرني</label><button type="button" class="link-btn" id="forgotBtn">نسيت كلمة المرور؟</button></div>
             <button class="btn primary wide" type="submit">دخول المنصة <span>←</span></button>
           </form>
+          <div class="auth-divider"><span>أو</span></div>
+          <button id="googleLoginBtn" class="btn google-btn wide" type="button"><span class="google-mark" aria-hidden="true">G</span>المتابعة باستخدام Google</button>
           <div class="switch-line">ليس لديك حساب؟ <button type="button" class="link-btn" id="signupBtn">إنشاء حساب جديد</button></div>
         </div>
 
         <div id="signupCard" class="auth-card hidden">
           <span class="eyebrow">حساب جديد</span>
           <h2>أنشئ حسابك</h2>
-          <p class="muted">الخانات المعلّمة مطلوبة. يجب أن يكون البريد Gmail.</p>
+          <p class="muted">الخانات المعلّمة مطلوبة. استخدم بريد Gmail؛ بعد إنشاء الحساب ستختار المستوى والمقرر في الصفحة التالية.</p>
           <form id="signupForm" class="stack-form">
             <label>عنوان البريد الإلكتروني <em>*</em><input id="signupEmail" type="email" required placeholder="name@gmail.com" autocomplete="email"></label>
             <label>الاسم الكامل <em>*</em><input id="signupName" type="text" required maxlength="120" placeholder="اكتب اسمك الكامل" autocomplete="name"></label>
             <label>رقم الهاتف <small>اختياري</small><input id="signupPhone" type="tel" maxlength="30" placeholder="مثال: 77xxxxxxx" autocomplete="tel"></label>
-            <label>المستوى الدراسي <em>*</em><select id="signupLevel" required><option value="" selected disabled>اختر المستوى</option><option value="1">المستوى الأول</option><option value="2">المستوى الثاني</option><option value="3">المستوى الثالث</option><option value="4">المستوى الرابع</option></select></label>
             <label>كلمة المرور <em>*</em><span class="input-action-wrap"><input id="signupPassword" type="password" minlength="8" required placeholder="8 أحرف على الأقل"><button type="button" class="icon-text-btn" data-password-toggle="signupPassword">إظهار</button></span></label>
             <label>تأكيد كلمة المرور <em>*</em><span class="input-action-wrap"><input id="signupConfirm" type="password" minlength="8" required placeholder="أعد كتابة كلمة المرور"><button type="button" class="icon-text-btn" data-password-toggle="signupConfirm">إظهار</button></span></label>
             <label class="check"><input id="signupTerms" type="checkbox" required> أوافق على شروط استخدام المنصة وسياسة الاستخدام الأكاديمي.</label>
             <button class="btn primary wide" type="submit">إنشاء الحساب</button>
           </form>
+          <div class="auth-divider"><span>أو</span></div>
+          <button id="googleSignupBtn" class="btn google-btn wide" type="button"><span class="google-mark" aria-hidden="true">G</span>إنشاء الحساب باستخدام Google</button>
           <div class="switch-line">لديك حساب بالفعل؟ <button type="button" class="link-btn" id="backLoginBtn">العودة لتسجيل الدخول</button></div>
         </div>
 
@@ -87,8 +91,40 @@
         </div>
 
         <div class="auth-footnote"><span class="secure-dot"></span><span>مصادقة Firebase + صلاحيات Firestore مؤمّنة بقواعد خادم.</span></div>
+        <p class="provider-setup-note">يلزم تفعيل Email/Password وGoogle وإضافة نطاق الموقع إلى النطاقات المعتمدة في Firebase Authentication.</p>
       </div>
     </div>
+  </section>
+
+  <section id="profileSetupView" class="profile-setup-view hidden" aria-labelledby="profileSetupTitle">
+    <header class="setup-topbar">
+      <div class="brand-block"><img class="brand-logo" src="./assets/logo-placeholder.svg" alt=""><div><b>منصة خدمة الطلاب</b><span>كلية الشريعة والقانون</span></div></div>
+      <button id="setupLogoutBtn" class="btn soft" type="button">تسجيل الخروج</button>
+    </header>
+    <main class="setup-main">
+      <div class="setup-copy">
+        <span class="eyebrow">الخطوة التالية</span>
+        <h1 id="profileSetupTitle">أكمل ملفك الدراسي</h1>
+        <p class="muted">مرحبًا <b id="profileSetupUserName">بالطالب</b>. اختر مستواك ثم المقرر من قائمة ذلك المستوى لحفظ بياناتك بأمان.</p>
+        <p id="profileSetupOfflineNotice" class="offline-note" role="status" aria-live="polite">يمكن إكمال هذه الخطوة دون اتصال إذا سبق تسجيل الدخول على هذا الجهاز؛ سيُزامن الاختيار عند عودة الشبكة.</p>
+      </div>
+      <form id="studentSetupForm" class="setup-card stack-form">
+        <label for="studentLevel">المستوى الدراسي <em>*</em>
+          <select id="studentLevel" required>
+            <option value="" selected disabled>اختر المستوى</option>
+            <option value="1">المستوى الأول</option>
+            <option value="2">المستوى الثاني</option>
+            <option value="3">المستوى الثالث</option>
+            <option value="4">المستوى الرابع</option>
+          </select>
+        </label>
+        <label for="studentCourse">المقرر الدراسي <em>*</em>
+          <select id="studentCourse" required disabled><option value="">اختر المستوى أولًا</option></select>
+        </label>
+        <small id="courseSelectionHint" class="muted" role="status" aria-live="polite">تظهر المقررات بعد اختيار المستوى.</small>
+        <button class="btn primary wide" type="submit">حفظ الاختيار والمتابعة</button>
+      </form>
+    </main>
   </section>
 
   <section id="appView" class="app-view hidden">
@@ -117,7 +153,7 @@
         <button class="side-nav" data-page="reports"><span>▧</span>التقارير</button>
         <button class="side-nav" data-page="media"><span>◫</span>الوسائط</button>
         <div id="adminNavGroup" class="hidden"><div class="side-sep"></div><div class="side-title">الإدارة</div><button class="side-nav" data-page="admin"><span>⚙</span>لوحة التحكم</button></div>
-        <div class="sidebar-end"><span class="status-dot"></span><span>متصل</span></div>
+        <div class="sidebar-end"><span id="connectionDot" class="status-dot"></span><span id="connectionLabel">متصل</span></div>
       </aside>
 
       <main class="main-content">
@@ -145,6 +181,6 @@
 
   <div id="modalRoot"></div>
 
-  <script type="module" src="./app.js"></script>
+  <script defer src="./app.js"></script>
 </body>
 </html>

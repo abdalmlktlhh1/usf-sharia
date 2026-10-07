@@ -38,6 +38,46 @@ service cloud.firestore {
         || isMediaManager() || isMediaDeputy();
     }
 
+    function validStudentCourse(levelValue, courseValue) {
+      return (levelValue == '1' && courseValue in ['فقة العبادات','مبادى الاقتصاد','مصطلح الحديث','اصول الفقة','مدخل القانون','اللغة العربية','النظم السياسية','اللغة الانجليزية','تاريخ القانون','علم الاجرام','الحاسوب','مدخل الفقة','الصراع العربي'])
+        || (levelValue == '2' && courseValue in ['قانون مدني','قانون العقوبات','قانون اداري','نقود وبنوك','قانون دولي','احكام اسرة','ادارة محلية','منظمات دولية','فقة معاملات','اصول الفقة','اللغة العربية','الثقافة الاسلامية'])
+        || (levelValue == '3' && courseValue in ['قانون مدني','احكام المواريث','قانون عقوبات','قانون العمل','قضاء اداري','فقه السيرة','قانون تجاري','قانون بحري_جوي','قانون المرافعات','اصول الفقة','فقة معاملات','اللغة العربية'])
+        || (levelValue == '4' && courseValue in ['القانون المدني','اصول الفقة','تنفيذ جبري','تنازع القوانين','الوصية والوقف','تجاري٤','اجراءات جزائية','مالية عامة وتشريع ضريبي','القضاء والإثبات','تفسير ايات','الجنسية والموطن','لغة عربية٤','مناهج البحث']);
+    }
+
+    function validProfileCreate(uid) {
+      return signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasAll(['name','email','phone','role','level','course','profileComplete','active','createdAt','updatedAt'])
+        && request.resource.data.keys().hasOnly(['name','email','phone','role','level','course','profileComplete','active','createdAt','updatedAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 120
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.phone is string && request.resource.data.phone.size() <= 30
+        && request.resource.data.role == 'student'
+        && request.resource.data.active == true
+        && ((request.resource.data.profileComplete == false && request.resource.data.level == '' && request.resource.data.course == '')
+          || (request.resource.data.profileComplete == true && validStudentCourse(request.resource.data.level, request.resource.data.course)));
+    }
+
+    function validSelfProfileUpdate(uid) {
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      return activeUser() && request.auth.uid == uid
+        && changed.hasOnly(['name','phone','updatedAt','level','course','profileComplete'])
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.active == resource.data.active
+        && request.resource.data.get('email','') == resource.data.get('email','')
+        && request.resource.data.get('name','') is string && request.resource.data.get('name','').size() <= 120
+        && request.resource.data.get('phone','') is string && request.resource.data.get('phone','').size() <= 30
+        && ((resource.data.role == 'student'
+            && request.resource.data.get('profileComplete', false) == true
+            && validStudentCourse(request.resource.data.get('level',''), request.resource.data.get('course',''))
+            && (resource.data.get('profileComplete', false) != true
+              || !validStudentCourse(resource.data.get('level',''), resource.data.get('course',''))))
+          || (request.resource.data.get('level','') == resource.data.get('level','')
+            && request.resource.data.get('course','') == resource.data.get('course','')
+            && request.resource.data.get('profileComplete', false) == resource.data.get('profileComplete', false)
+            && changed.hasOnly(['name','phone','updatedAt'])));
+    }
+
     function sameLevelResource() {
       return resource.data.level == level() || resource.data.level == 'all';
     }
@@ -51,14 +91,8 @@ service cloud.firestore {
     // User profile: self read/write only for safe fields; role/status are server-managed.
     match /users/{uid} {
       allow read: if activeUser() && (request.auth.uid == uid || isStaff());
-      allow create: if signedIn() && request.auth.uid == uid
-        && request.resource.data.role == 'student'
-        && request.resource.data.active == true
-        && request.resource.data.email == request.auth.token.email;
-      allow update: if activeUser() && request.auth.uid == uid
-        && request.resource.data.role == resource.data.role
-        && request.resource.data.active == resource.data.active
-        && request.resource.data.level == resource.data.level;
+      allow create: if validProfileCreate(uid);
+      allow update: if validSelfProfileUpdate(uid);
       allow delete: if false;
     }
 

@@ -1,14 +1,12 @@
-الترتيب المختصر:
+إعداد منصة usf-sharia الحالية:
 
-1) أنشئ مشروع Firebase.
-2) فعّل Email/Password + Firestore + Storage + Functions + Hosting.
-3) أضف Web App وانسخ إعداداته إلى public/firebase-config.js.
-4) أنشئ حساب Gmail من الموقع.
-5) في Firestore Console افتح users ثم ملف حسابك، واجعل role=owner و level=all و active=true.
-6) في Termux:
-   firebase login
-   firebase use PROJECT_ID
-   cd functions && npm install && cd ..
-7) النشر:
-   firebase deploy --only firestore,storage,functions,hosting
-8) افتح رابط Firebase Hosting.
+1) تأكد من المشروع القائم usf-sharia؛ إعداد Firebase Web موجود في public/firebase-config.js.
+2) في Firebase Console فعّل Authentication → Email/Password وGoogle، وأضف usf-sharia.web.app إلى Authorized domains.
+3) تأكد من تفعيل Firestore وStorage وFunctions المستخدمة حاليًا.
+4) سجّل طالبًا بالبريد وكلمة المرور أو Google؛ بعد الدخول تظهر صفحة المستوى ثم قائمة مواد المستوى.
+5) ملف الطالب في users/{UID}، وتتحقق قواعد Firestore من مطابقة المقرر للمستوى وتحمي الدور والحالة.
+6) البناء والاختبار: npm ci && npm test && npm run build && npm run check
+7) إذا لزم Firebase CLI: انسخ .firebaserc.example إلى .firebaserc ثم نفّذ firebase login.
+8) لم يُنشر هذا الفرع على الموقع الحي. بعد المراجعة فقط: firebase deploy --only hosting,firestore:rules
+
+الاتصال مطلوب لإنشاء حساب جديد، وفتح Google، أو تحميل بيانات أول مرة. بعد فتح المنصة وتخزين بياناتها على الجهاز، تعمل الواجهة والبيانات المخزنة دون اتصال وتُزامن التعديلات عند عودة الشبكة.
