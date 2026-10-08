@@ -1,7 +1,7 @@
 /* Cache only the public app shell. Firebase requests and user-specific responses stay network-only. */
 'use strict';
 
-const CACHE_NAME = 'usf-sharia-shell-v1';
+const CACHE_NAME = 'usf-sharia-shell-v2';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -14,7 +14,12 @@ const APP_SHELL = [
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await cache.addAll(APP_SHELL);
+    // Force a network revalidation so an older browser HTTP cache cannot
+    // repopulate the new service-worker cache with a stale app bundle.
+    const installRequests = APP_SHELL.map(path =>
+      path === '/app.js' ? new Request(path, { cache: 'reload' }) : path
+    );
+    await cache.addAll(installRequests);
     await self.skipWaiting();
   })());
 });
