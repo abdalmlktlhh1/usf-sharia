@@ -1,0 +1,16 @@
+{
+  "id": "/",
+  "name": "منصة خدمة الطلاب — كلية الشريعة والقانون",
+  "short_name": "خدمة الطلاب",
+  "description": "منصة خدمة طلاب كلية الشريعة والقانون",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f8f8",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "/assets/logo-placeholder.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

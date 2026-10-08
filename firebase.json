@@ -15,7 +15,9 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "**/*.backup",
+      "**/*backup*"
     ],
     "cleanUrls": true,
     "trailingSlash": false,

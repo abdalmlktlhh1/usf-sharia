@@ -1,124 +1,73 @@
-# منصة خدمة الطلاب — Firebase Pro
+# منصة خدمة الطلاب — كلية الشريعة والقانون
 
-نسخة جديدة مبنية حول **Firebase Authentication + Cloud Firestore + Cloud Storage + Cloud Functions + Firebase Hosting** بدل الاعتماد على Google Sheets وكلمات المرور المخزنة في جدول.
+هذا هو المستودع الحالي لمنصة `usf-sharia`، وليس مشروعًا منفصلًا. التطبيق مبني على Firebase Authentication وCloud Firestore وCloud Storage وCloud Functions وFirebase Hosting.
 
-## ما الذي تغير؟
-- تسجيل دخول فعلي عبر Firebase Authentication.
-- إنشاء حساب جديد من الموقع: Gmail إلزامي، الاسم إلزامي، الهاتف اختياري، المستوى إلزامي، وكلمة مرور.
-- استرجاع كلمة المرور عبر البريد الإلكتروني.
-- لا يوجد مربع بيانات دخول تجريبي في واجهة الدخول.
-- لوحة تحكم متعددة الأدوار مع صلاحيات خادمية.
-- إدارة المستخدمين وتفعيل/إيقاف الحسابات وتغيير الأدوار.
-- إدارة المقررات.
-- إنشاء اختبارات بأسئلة اختيار من متعدد وصح/خطأ.
-- التصحيح يتم على الخادم، ومفاتيح الإجابة لا يقرأها الطالب من Firestore.
-- منع إعادة أداء الاختبار نفسه للمستخدم نفسه.
-- النتائج الخاصة بالطالب، ونتائج الإدارة.
-- الإعلانات والتقارير والأنشطة والوسائط.
-- لوحة كاملة لتخصيص اسم الموقع والألوان والوضع الفاتح/الداكن/حسب الجهاز، الكثافة، استدارة البطاقات.
-- رفع شعار الموقع أو إزالته عبر Firebase Storage.
-- سجل عمليات Audit.
-- قواعد Firestore وStorage تمنع الكتابة الحساسة مباشرة من العميل.
+## تسجيل الطالب والملف الدراسي
 
-## 1) أنشئ مشروع Firebase
-من Firebase Console أنشئ مشروعًا جديدًا.
+- ينشئ الطالب حسابًا حقيقيًا عبر Firebase بالبريد وكلمة المرور، أو يتابع باستخدام Google.
+- بعد الدخول لأول مرة تظهر صفحة مستقلة لاختيار المستوى الأول أو الثاني أو الثالث أو الرابع، ثم مقرر من قائمة ذلك المستوى.
+- تُحفظ بيانات الطالب في `users/{uid}`، ويُحفظ المقرر مع المستوى بعد التحقق منهما معًا.
+- قواعد Firestore تقصر إنشاء الملف على دور `student` النشط، ولا تسمح للطالب بتغيير دوره أو حالة الحساب أو بيانات البريد. اختيار المستوى والمقرر يُستكمل مرة واحدة، ولا يُقبل مقرر من مستوى آخر.
+- تبقى لوحة المنصة الحالية، والاختبارات والنتائج والإعلانات والإدارة كما هي؛ المقرر المختار جزء من الملف الدراسي ولا ينشئ تلقائيًا مقررًا إداريًا جديدًا في مجموعة `courses`.
 
-فعّل:
+## العمل دون اتصال
+
+- يُبنى Firebase SDK داخل `public/app.js` بدل تحميل وحداته من CDN.
+- يخزن Service Worker ملفات الواجهة العامة فقط. لا يخزن استجابات Firebase الخاصة بالمستخدمين في Cache API.
+- يستخدم Firestore تخزينًا محليًا دائمًا على الجهاز للبيانات التي سبق تحميلها، وتبقى الجلسة المحفوظة متاحة على الجهاز نفسه.
+- إنشاء الحساب، نافذة Google، وأول تحميل لملف أو بيانات غير مخزنة تحتاج إلى الإنترنت. يمكن فتح واجهة سبق تحميلها والعمل بالبيانات المتاحة دون اتصال؛ تُزامن تعديلات اختيار المستوى والمقرر عند عودة الاتصال.
+
+## إعداد Firebase
+
+المشروع مربوط بإعداد Firebase Web للتطبيق `usf-sharia` في `public/firebase-config.js`. هذا إعداد عميل عام وليس مفتاح خدمة أو كلمة مرور؛ لا تضع Service Account Key في الواجهة أو المستودع.
+
+في Firebase Console للمشروع القائم تأكد من تفعيل:
+
 1. Authentication → Sign-in method → Email/Password.
-2. Firestore Database.
-3. Storage.
-4. Functions.
-5. Hosting.
+2. Authentication → Sign-in method → Google.
+3. إضافة نطاق الاستضافة، مثل `usf-sharia.web.app`، إلى Authentication → Settings → Authorized domains.
+4. Firestore Database وStorage وCloud Functions حسب الخدمات المستخدمة في الموقع.
 
-## 2) أضف تطبيق Web
-من Project settings → Your apps → Web app، انسخ إعدادات Firebase إلى:
+لأي حساب طالب جديد، ينشئ التطبيق ملفًا أوليًا محدودًا ثم يطلب المستوى والمقرر. إذا كان المشروع جديدًا تمامًا ولا يوجد مالك، أنشئ أول حساب من الموقع ثم غيّر يدويًا في Firestore `users/{UID}` الحقول `role=owner` و`level=all` و`active=true`، ثم سجّل الخروج والدخول. لا تمنح دور المالك عبر واجهة عامة.
 
-`public/firebase-config.js`
+## البناء والاختبار
 
-اترك أسماء الحقول كما هي، واستبدل القيم التجريبية فقط.
+من جذر المستودع استخدم Node.js 22:
 
-## 3) تسجيل أول حساب
-افتح الموقع وسجّل حساب Gmail عادي.
+```bash
+npm ci
+npm test
+npm run test:rules
+npm run build
+npm run check
+npm ci --prefix functions
+npm --prefix functions run lint
+```
 
-بعد إنشاء أول حساب، إذا كان المشروع جديدًا ولا يوجد مالك، افتح Firestore Console ثم:
+يشغّل `npm run test:rules` محاكي Firestore محليًا على مشروع تجريبي `demo-usf-sharia`؛ لا يتصل ببيانات الإنتاج.
 
-`users/{UID}`
+لتشغيل نسخة معاينة محلية:
 
-وغيّر:
-- `role` إلى `owner`
-- `level` إلى `all`
-- `active` إلى `true`
+```bash
+npm run serve
+```
 
-بعد ذلك سجّل الخروج ثم الدخول من جديد.
-
-> هذه الخطوة اليدوية مقصودة حتى لا يستطيع أي شخص يسبقك إلى التسجيل العام أن يحصل على دور المالك تلقائيًا.
-
-## 4) تثبيت الحزم
-من جذر المشروع:
+ولتهيئة Firebase CLI على الجهاز عند الحاجة:
 
 ```bash
 npm install -g firebase-tools
-cd functions
-npm install
-cd ..
-```
-
-Cloud Functions في هذه النسخة تستخدم Node.js 22. Firebase توثّق دعم Node.js 20 و22 حاليًا. 
-
-## 5) ربط المشروع
-أنشئ ملف `.firebaserc` من المثال:
-
-```bash
 cp .firebaserc.example .firebaserc
-```
-
-ثم استبدل `YOUR_FIREBASE_PROJECT_ID` بمعرّف مشروعك.
-
-سجّل الدخول:
-
-```bash
 firebase login
 ```
 
-## 6) نشر القواعد والدوال والاستضافة
-من جذر المشروع:
+## النشر لاحقًا
+
+هذه التغييرات مُعدة للمراجعة فقط ولم تُنشر على الموقع الحي. بعد اعتمادها، وبعد التأكد من مزودي المصادقة والنطاقات والقواعد، يمكن بناء الحزمة ثم نشر الواجهة والقواعد فقط:
 
 ```bash
-firebase deploy --only firestore,storage,functions,hosting
+npm ci
+npm run build
+firebase deploy --only hosting,firestore:rules
 ```
 
-أو الاستضافة وحدها بعد اكتمال البنية:
-
-```bash
-firebase deploy --only hosting
-```
-
-## 7) البيانات القديمة في Google Sheets
-النسخة الجديدة **لا تعتمد على قاعدة Google Sheets القديمة** لتسجيل الدخول.
-لا تحذف جدولك القديم حتى تتأكد أن كل البيانات المطلوبة نُقلت إلى Firestore.
-
-## 8) سيناريوهات مهمة تم أخذها بالحسبان
-- حساب موقوف: تتم مصادقة Firebase لكن يمنع التطبيق الحساب من الدخول إلى المنصة.
-- انتهاء الجلسة/تسجيل الخروج.
-- بريد غير Gmail أثناء التسجيل: مرفوض من الواجهة.
-- بريد مستخدم مسبقًا.
-- كلمة مرور أقل من 8 أحرف.
-- تغيير دور الطالب أو إيقافه من لوحة الإدارة.
-- حماية المالك من الإيقاف والحذف وتغيير الدور.
-- مدير المستوى لا يستطيع إدارة مستوى آخر عبر Cloud Functions.
-- الطالب لا يستطيع إنشاء نتيجة مزورة مباشرة في Firestore.
-- مفتاح تصحيح الاختبار في مجموعة `examKeys` غير متاحة للعميل.
-- رفع الشعار محصور بحسابات الإدارة وبصيغة صورة وحجم محدد.
-- الأرشفة بدل الحذف المباشر لبعض أنواع المحتوى.
-- سجل عمليات للإجراءات الإدارية الحساسة.
-
-## 9) ملاحظات أمان
-لا تضع Service Account Key داخل مجلد `public` أو داخل المتصفح.
-إعداد Firebase Web الظاهر في `firebase-config.js` ليس كلمة سر؛ حماية المشروع تعتمد على Authentication وFirestore Rules وStorage Rules وCloud Functions.
-
-## 10) المراجع الرسمية
-- Firebase Authentication / Password auth: https://firebase.google.com/docs/auth/web/password-auth
-- Firestore Security Rules: https://firebase.google.com/docs/firestore/security/get-started
-- Firebase Hosting: https://firebase.google.com/docs/hosting/quickstart
-- Cloud Storage uploads: https://firebase.google.com/docs/storage/web/upload-files
-- Callable Cloud Functions: https://firebase.google.com/docs/functions/callable
+لا تحذف بيانات Google Sheets القديمة أو تغيّر Functions/Storage أثناء مراجعة هذه التغييرات. سير GitHub يفحص البناء والاختبارات ولا ينفذ نشر Firebase.

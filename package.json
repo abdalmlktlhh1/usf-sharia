@@ -1,0 +1,26 @@
+{
+  "name": "usf-sharia-student-platform",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node --check scripts/build.mjs && node --check src/app.js && node --check public/app.js && node --check tests/firestore-rules.integration.js && node --check functions/index.js",
+    "test": "node --test",
+    "test:rules": "npx --yes firebase-tools@14.19.1 emulators:exec --only firestore --project demo-usf-sharia --non-interactive \"node tests/firestore-rules.integration.js\"",
+    "serve": "npm run build && python3 -m http.server 8000 --directory public --bind 0.0.0.0"
+  },
+  "dependencies": {
+    "firebase": "12.19.0"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "esbuild": "^0.28.2"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.14.5"
+  }
+}
